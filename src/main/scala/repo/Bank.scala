@@ -19,6 +19,9 @@ trait BankWriteRepository {
   def store(bank: Bank): Future[Int]
 
   def update(bank: Bank): Future[Int]
+
+  def bulkInsert(banks: List[Bank]): Future[Option[Int]]
+
 }
 
 trait BankWriteRepositoryImpl extends BankWriteRepository {
@@ -26,15 +29,14 @@ trait BankWriteRepositoryImpl extends BankWriteRepository {
 
   import driver.api._
 
-  def store(bank: Bank): Future[Int] = {
-    val res = db.run(bankTableQuery += bank)
-     import scala.concurrent.ExecutionContext.Implicits.global
-    res.foreach(e => println("inserted" + e))
-    res
-  }
+  def store(bank: Bank): Future[Int] =
+    db.run(bankTableQuery += bank)
 
   def update(bank: Bank): Future[Int] =
     db.run(bankTableQuery.filter(_.id === bank.id).update(bank))
+
+  def bulkInsert(banks: List[Bank]): Future[Option[Int]] =
+    db.run(bankTableQuery ++= banks)
 
 }
 
