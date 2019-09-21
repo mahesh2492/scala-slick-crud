@@ -27,14 +27,14 @@ trait BankWriteRepositoryImpl extends BankWriteRepository {
   import driver.api._
 
   def store(bank: Bank): Future[Int] = {
-    val res = db.run(bankQuery += bank)
+    val res = db.run(bankTableQuery += bank)
      import scala.concurrent.ExecutionContext.Implicits.global
     res.foreach(e => println("inserted" + e))
     res
   }
 
   def update(bank: Bank): Future[Int] =
-    db.run(bankQuery.filter(_.id === bank.id).update(bank))
+    db.run(bankTableQuery.filter(_.id === bank.id).update(bank))
 
 }
 
@@ -54,10 +54,10 @@ trait BankReadRepositoryImpl extends BankReadRepository {
   import driver.api._
 
   def getBankById(id: Int): Future[Option[Bank]] =
-    db.run(bankQuery.filter(_.id === id).result.headOption)
+    db.run(bankTableQuery.filter(_.id === id).result.headOption)
 
   def list: Future[List[Bank]] =
-    db.run(bankQuery.to[List].result)
+    db.run(bankTableQuery.to[List].result)
 
 }
 
@@ -66,7 +66,7 @@ trait BankTable {
 
   import driver.api._
 
-  val bankQuery: TableQuery[BankSlickMapping] = TableQuery[BankSlickMapping]
+  val bankTableQuery: TableQuery[BankSlickMapping] = TableQuery[BankSlickMapping]
 
   class BankSlickMapping(tag: Tag) extends Table[Bank](tag, "bank") {
 
